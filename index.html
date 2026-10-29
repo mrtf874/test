@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Las Cuatro Estaciones del Matrimonio</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+      background: #fdf6ee;
+      color: #1f2328;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px 64px;
+    }
+
+    header {
+      text-align: center;
+      max-width: 680px;
+      margin-bottom: 36px;
+    }
+
+    header .badge {
+      display: inline-block;
+      background: #f3e8d0;
+      color: #7c5012;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+    }
+
+    header h1 {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.25;
+      color: #1f2328;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      font-size: 15px;
+      color: #57606a;
+      line-height: 1.65;
+    }
+
+    .progress-bar-wrap {
+      width: 100%;
+      max-width: 680px;
+      background: #e5e7eb;
+      border-radius: 8px;
+      height: 6px;
+      margin-bottom: 28px;
+      overflow: hidden;
+    }
+
+    #progress-bar {
+      height: 100%;
+      background: #d4821a;
+      border-radius: 8px;
+      transition: width .35s ease;
+      width: 0%;
+    }
+
+    .progress-label {
+      text-align: right;
+      font-size: 12px;
+      color: #57606a;
+      max-width: 680px;
+      width: 100%;
+      margin-bottom: 6px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 28px 28px 24px;
+      max-width: 680px;
+      width: 100%;
+      margin-bottom: 18px;
+      transition: box-shadow .2s;
+    }
+
+    .card.answered {
+      border-color: #d4821a;
+    }
+
+    .question-num {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #d4821a;
+      margin-bottom: 8px;
+    }
+
+    .question-text {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: border-color .18s, background .18s;
+      background: #fafafa;
+    }
+
+    .option:hover {
+      border-color: #d4821a;
+      background: #fdf3e3;
+    }
+
+    .option.selected {
+      border-color: #d4821a;
+      background: #fdf3e3;
+    }
+
+    .option input[type="radio"] {
+      display: none;
+    }
+
+    .option-letter {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #f3e8d0;
+      color: #7c5012;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+      transition: background .18s, color .18s;
+    }
+
+    .option.selected .option-letter {
+      background: #d4821a;
+      color: #fff;
+    }
+
+    .option-text {
+      font-size: 14px;
+      line-height: 1.55;
+      color: #374151;
+    }
+
+    .btn-wrap {
+      display: flex;
+      justify-content: center;
+      margin-top: 32px;
+      max-width: 680px;
+      width: 100%;
+    }
+
+    #btn-submit {
+      padding: 14px 48px;
+      background: #d4821a;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s, opacity .2s;
+      opacity: .4;
+      pointer-events: none;
+    }
+
+    #btn-submit.ready {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #btn-submit:hover {
+      background: #b86b10;
+    }
+
+    /* ─── Result ─── */
+    #result {
+      display: none;
+      max-width: 680px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .season-emoji {
+      font-size: 72px;
+      margin-bottom: 12px;
+      line-height: 1;
+    }
+
+    .season-title {
+      font-size: 32px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      color: #1f2328;
+    }
+
+    .season-subtitle {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #d4821a;
+      margin-bottom: 22px;
+    }
+
+    .season-card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 28px 28px 24px;
+      text-align: left;
+      margin-bottom: 24px;
+    }
+
+    .season-card p {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #374151;
+    }
+
+    .score-breakdown {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .score-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .score-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #f3e8d0;
+      color: #7c5012;
+      font-weight: 800;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .score-circle.winner {
+      background: #d4821a;
+      color: #fff;
+    }
+
+    .score-lbl {
+      font-size: 11px;
+      font-weight: 600;
+      color: #57606a;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    #btn-restart {
+      padding: 12px 36px;
+      background: transparent;
+      color: #d4821a;
+      border: 2px solid #d4821a;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+      margin-bottom: 16px;
+    }
+
+    #btn-restart:hover {
+      background: #d4821a;
+      color: #fff;
+    }
+
+    footer {
+      margin-top: 48px;
+      font-size: 12px;
+      color: #57606a;
+      text-align: center;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 20px;
+      width: 100%;
+      max-width: 680px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="badge">Test de Pareja · Gary Chapman</div>
+  <h1>Las Cuatro Estaciones del Matrimonio</h1>
+  <p>Diagnóstico adaptado al estilo colombiano. Respondan con total honestidad. Al finalizar, la app calculará automáticamente en qué estación se encuentra su relación hoy.</p>
+</header>
+
+<div class="progress-label" id="progress-label">Pregunta 0 de 8</div>
+<div class="progress-bar-wrap">
+  <div id="progress-bar"></div>
+</div>
+
+<div id="quiz"></div>
+
+<div class="btn-wrap">
+  <button id="btn-submit">Ver mi resultado 🍃</button>
+</div>
+
+<div id="result">
+  <div class="season-emoji" id="res-emoji"></div>
+  <div class="season-title" id="res-title"></div>
+  <div class="season-subtitle" id="res-subtitle"></div>
+  <div class="score-breakdown" id="res-scores"></div>
+  <div class="season-card">
+    <p id="res-desc"></p>
+  </div>
+  <button id="btn-restart">Volver a hacer el test</button>
+</div>
+
+<footer>Basado en <em>Las Cuatro Estaciones del Matrimonio</em> de Gary Chapman &nbsp;·&nbsp; Hecho con ❤️ para parejas colombianas</footer>
+
+<script>
+  const questions = [
+    {
+      text: "Cuando pensamos en el futuro de nosotros dos, ¿qué se nos viene a la cabeza?",
+      options: [
+        { letter: "A", text: "Pura emoción, tenemos un montón de planes, proyectos y sueños por cumplir juntos." },
+        { letter: "B", text: "Nos sentimos tranquilos y seguros de lo que hemos construido, vamos por buen camino." },
+        { letter: "C", text: "Nos da un poquito de susto o incertidumbre; como que ya no planeamos tanto a futuro." },
+        { letter: "D", text: "Desaliento total. Es difícil ver un futuro bonito o dan ganas de tirar la toalla." }
+      ]
+    },
+    {
+      text: "¿Cómo manejamos los desacuerdos o las pelas últimamente?",
+      options: [
+        { letter: "A", text: "Hablamos de una, buscamos soluciones y quedamos súper parchados." },
+        { letter: "B", text: "Nos entendemos bien, respetamos las diferencias y resolvemos las cosas con madurez." },
+        { letter: "C", text: "Preferimos barrer las cosas debajo de la alfombra y no decir nada para evitar el rayón." },
+        { letter: "D", text: "O nos agarramos de las mechas con gritos y reclamos, o nos clavamos la ley del hielo absoluta." }
+      ]
+    },
+    {
+      text: "Si hablamos de los detalles, el romance y las demostraciones de afecto...",
+      options: [
+        { letter: "A", text: "Estamos en pleno idilio: nos buscamos harto, hay carticas, mensajitos y muchas ganas." },
+        { letter: "B", text: "Hay estabilidad; nos consentimos seguido y mantenemos viva la chispa en el día a día." },
+        { letter: "C", text: "La verdad, la rutina nos está ganando y nos hemos descuidado un montón." },
+        { letter: "D", text: "Eso ya ni existe. Hay un frío tenaz entre los dos y cero ganas de tocarnos." }
+      ]
+    },
+    {
+      text: "En la convivencia diaria y las responsabilidades de la casa o el dinero:",
+      options: [
+        { letter: "A", text: "Hacemos un equipo tremendo, nos apoyamos con toda y con buena actitud." },
+        { letter: "B", text: "Todo fluye relajado, cada quien sabe qué hacer y nos coordinamos súper bien." },
+        { letter: "C", text: "Nos sentimos cansados, a veces pesa llevar la carga y se siente monotonía." },
+        { letter: "D", text: "Vivimos como extraños bajo el mismo techo, cada uno metido en su propio cuento y peleando por todo." }
+      ]
+    },
+    {
+      text: "Cuando mi pareja me habla o me cuenta algo, mi reacción es:",
+      options: [
+        { letter: "A", text: "Le pongo toda la atención del mundo, me emociona mucho escucharle." },
+        { letter: "B", text: "Le escucho con respeto, empatía y nos entendemos perfectamente." },
+        { letter: "C", text: "A veces lo oigo por encima, ando en mis cosas y me cuesta concentrarme en lo que dice." },
+        { letter: "D", text: "Me da fastidio, me defiendo de una vez o simplemente me entra por un oído y me sale por el otro." }
+      ]
+    },
+    {
+      text: "La palabra que mejor describe el ambiente en nuestra casa hoy es:",
+      options: [
+        { letter: "A", text: "Entusiasmo y alegría." },
+        { letter: "B", text: "Paz y seguridad." },
+        { letter: "C", text: "Distancia y rutina." },
+        { letter: "D", text: "Tensión y frialdad." }
+      ]
+    },
+    {
+      text: "¿Cómo nos sentimos frente a los defectos del otro?",
+      options: [
+        { letter: "A", text: "Los vemos pequeños y nos enfocamos en todas sus virtudes." },
+        { letter: "B", text: "Los aceptamos con tranquilidad, entendemos que nadie es perfecto." },
+        { letter: "C", text: "Nos empiezan a tallar e incomodar cosas que antes no nos importaban." },
+        { letter: "D", text: "Nos da una mamera tenaz; criticamos y juzgamos todo lo que el otro hace." }
+      ]
+    },
+    {
+      text: "Si nos pasa algo difícil o un problema externo, ¿cómo reaccionamos?",
+      options: [
+        { letter: "A", text: "Nos unimos más que nunca, listos para arrancar con toda a solucionarlo." },
+        { letter: "B", text: "Lo afrontamos con calma y madurez, confiando en el apoyo mutuo." },
+        { letter: "C", text: "Nos estresamos y terminamos distanciándonos un poco mientras pasa el bache." },
+        { letter: "D", text: "Nos echamos la culpa el uno al otro y el problema nos termina de hundir." }
+      ]
+    }
+  ];
+
+  const seasons = {
+    A: {
+      emoji: "🌸",
+      title: "PRIMAVERA",
+      subtitle: "Ilusión · Nuevos comienzos · Energía positiva",
+      color: "#e8a0b0",
+      desc: "¡Están con toda! Su relación está llena de ilusión, nuevos comienzos y planes sabrosos. Hay mucha energía positiva. El único consejo: no se confíen, rieguen esa matica todos los días para que las raíces se vuelvan fuertes antes de que lleguen los tiempos difíciles."
+    },
+    B: {
+      emoji: "☀️",
+      title: "VERANO",
+      subtitle: "Estabilidad · Paz · Madurez",
+      color: "#f9c74f",
+      desc: "Están en un momento una chimba, lleno de estabilidad, paz y madurez. Ya se conocen, se aceptan y disfrutan los frutos de lo que han cosechado. ¡Ojo! El peligro aquí es volverse cómodos y caer en el aburrimiento. Sigan saliendo a parchar solos y mantengan la chispa viva."
+    },
+    C: {
+      emoji: "🍂",
+      title: "OTOÑO",
+      subtitle: "Rutina · Distancia silenciosa · Momento de reconectar",
+      color: "#d4821a",
+      desc: "Pilas, porque la rutina y el descuido silencioso les están ganando terreno. Hacia afuera todo se ve bien, pero por dentro se están alejando y dejando las cosas sin hablar por \"evitar peleas\". Es el momento exacto para sentarse a conversar con el corazón, admitir los descuidos y reconectar antes de que se enfríe el rancho."
+    },
+    D: {
+      emoji: "❄️",
+      title: "INVIERNO",
+      subtitle: "Frialdad · Tensión · Momento de pedir ayuda",
+      color: "#3b82d4",
+      desc: "Están pasando por un momento muy duro, con mucha frialdad, discusiones cansonas o un silencio gélido tenaz. Se sienten solos y frustrados viviendo juntos. ¡Pero no se rindan! El invierno no dura para siempre. Alguien tiene que dar el primer paso bajándole a la defensiva, pidiendo perdón por los errores del pasado y, si lo necesitan, buscando ayuda de un consejero o terapeuta de parejas para derretir ese hielo."
+    }
+  };
+
+  const answers = new Array(questions.length).fill(null);
+
+  function buildQuiz() {
+    const container = document.getElementById("quiz");
+    container.innerHTML = "";
+    questions.forEach((q, qi) => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.id = "card-" + qi;
+
+      const num = document.createElement("div");
+      num.className = "question-num";
+      num.textContent = "Pregunta " + (qi + 1) + " de " + questions.length;
+      card.appendChild(num);
+
+      const txt = document.createElement("div");
+      txt.className = "question-text";
+      txt.textContent = q.text;
+      card.appendChild(txt);
+
+      const opts = document.createElement("div");
+      opts.className = "options";
+
+      q.options.forEach(opt => {
+        const label = document.createElement("label");
+        label.className = "option";
+
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = "q" + qi;
+        input.value = opt.letter;
+        input.addEventListener("change", () => handleAnswer(qi, opt.letter));
+
+        const circle = document.createElement("div");
+        circle.className = "option-letter";
+        circle.textContent = opt.letter;
+
+        const optTxt = document.createElement("div");
+        optTxt.className = "option-text";
+        optTxt.textContent = opt.text;
+
+        label.appendChild(input);
+        label.appendChild(circle);
+        label.appendChild(optTxt);
+        opts.appendChild(label);
+      });
+
+      card.appendChild(opts);
+      container.appendChild(card);
+    });
+  }
+
+  function handleAnswer(qi, letter) {
+    answers[qi] = letter;
+    const card = document.getElementById("card-" + qi);
+    card.classList.add("answered");
+
+    // highlight selected option
+    card.querySelectorAll(".option").forEach(el => el.classList.remove("selected"));
+    const selected = card.querySelector(`input[value="${letter}"]`);
+    if (selected) selected.closest(".option").classList.add("selected");
+
+    updateProgress();
+    checkReady();
+  }
+
+  function updateProgress() {
+    const answered = answers.filter(a => a !== null).length;
+    const pct = (answered / questions.length) * 100;
+    document.getElementById("progress-bar").style.width = pct + "%";
+    document.getElementById("progress-label").textContent =
+      "Pregunta " + answered + " de " + questions.length;
+  }
+
+  function checkReady() {
+    const allAnswered = answers.every(a => a !== null);
+    const btn = document.getElementById("btn-submit");
+    if (allAnswered) btn.classList.add("ready");
+    else btn.classList.remove("ready");
+  }
+
+  function showResult() {
+    const counts = { A: 0, B: 0, C: 0, D: 0 };
+    answers.forEach(a => { if (a) counts[a]++; });
+
+    const winner = Object.entries(counts).sort((x, y) => y[1] - x[1])[0][0];
+    const season = seasons[winner];
+
+    document.getElementById("res-emoji").textContent = season.emoji;
+    document.getElementById("res-title").textContent = season.title;
+    document.getElementById("res-subtitle").textContent = season.subtitle;
+    document.getElementById("res-desc").textContent = season.desc;
+
+    const scoresEl = document.getElementById("res-scores");
+    scoresEl.innerHTML = "";
+    ["A","B","C","D"].forEach(l => {
+      const item = document.createElement("div");
+      item.className = "score-item";
+      const circle = document.createElement("div");
+      circle.className = "score-circle" + (l === winner ? " winner" : "");
+      circle.textContent = counts[l];
+      const lbl = document.createElement("div");
+      lbl.className = "score-lbl";
+      lbl.textContent = l === "A" ? "🌸 Primavera" : l === "B" ? "☀️ Verano" : l === "C" ? "🍂 Otoño" : "❄️ Invierno";
+      item.appendChild(circle);
+      item.appendChild(lbl);
+      scoresEl.appendChild(item);
+    });
+
+    document.getElementById("quiz").style.display = "none";
+    document.querySelector(".btn-wrap").style.display = "none";
+    document.querySelector(".progress-bar-wrap").style.display = "none";
+    document.getElementById("progress-label").style.display = "none";
+    document.getElementById("result").style.display = "block";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function restart() {
+    answers.fill(null);
+    document.getElementById("quiz").style.display = "";
+    document.querySelector(".btn-wrap").style.display = "";
+    document.querySelector(".progress-bar-wrap").style.display = "";
+    document.getElementById("progress-label").style.display = "";
+    document.getElementById("result").style.display = "none";
+    updateProgress();
+    checkReady();
+    buildQuiz();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  document.getElementById("btn-submit").addEventListener("click", showResult);
+  document.getElementById("btn-restart").addEventListener("click", restart);
+
+  buildQuiz();
+  updateProgress();
+</script>
+</body>
+</html>
